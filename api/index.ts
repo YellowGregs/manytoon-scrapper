@@ -36,7 +36,7 @@ app.get('/api/images/:manhwaName/chapter-:chapterNumber', async (req, res) => {
             const imageUrl = $(element).attr('src');
             if (imageUrl && imageUrl.startsWith('https://')) {
                 imageUrls.push(imageUrl);
-                processedImageUrls.push(`/api/image?url=${encodeURIComponent(imageUrl)}`);
+                processedImageUrls.push(`https://manytoon-scrapper.vercel.app/api/image?url=${encodeURIComponent(imageUrl)}`);
             }
         });
 
