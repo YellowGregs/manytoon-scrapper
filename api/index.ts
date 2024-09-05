@@ -1,15 +1,11 @@
 import express from 'express';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import cors from 'cors';
 
 const app = express();
 
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
+app.use(cors());
 
 app.get('/api/images/:manhwaName/chapter-:chapterNumber', async (req, res) => {
     const { manhwaName, chapterNumber } = req.params;
