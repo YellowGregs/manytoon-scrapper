@@ -3,7 +3,6 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 
 const app = express();
-const port = 3000;
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,6 +15,11 @@ app.get('/api/images/:manhwaName/chapter-:chapterNumber', async (req, res) => {
     const { manhwaName, chapterNumber } = req.params;
 
     try {
+        // URL validation :p
+        if (!manhwaName || !chapterNumber || isNaN(Number(chapterNumber))) {
+            return res.status(400).json({ error: 'Invalid manhwa name or chapter number' });
+        }
+
         const chapterUrl = `https://manytoon.com/comic/${manhwaName}/chapter-${chapterNumber}/`;
 
         const { data } = await axios.get(chapterUrl, {
@@ -29,13 +33,18 @@ app.get('/api/images/:manhwaName/chapter-:chapterNumber', async (req, res) => {
         const imageUrls: string[] = [];
         const processedImageUrls: string[] = [];
 
+        // Scraping image URLs
         $('.reading-content .wp-manga-chapter-img').each((_, element) => {
             const imageUrl = $(element).attr('src');
-            if (imageUrl) {
+            if (imageUrl && imageUrl.startsWith('https://')) {
                 imageUrls.push(imageUrl);
-                processedImageUrls.push(`http://localhost:3000/api/image?url=${encodeURIComponent(imageUrl)}`);
+                processedImageUrls.push(`/api/image?url=${encodeURIComponent(imageUrl)}`);
             }
         });
+
+        if (imageUrls.length === 0) {
+            return res.status(404).json({ error: 'No images found for the specified chapter.' });
+        }
 
         res.json({
             imageUrls,
@@ -55,6 +64,7 @@ app.get('/api/image', async (req, res) => {
     }
 
     try {
+        // Better image URL validation
         if (!imageUrl.startsWith('https://manytoon.com/')) {
             return res.status(400).json({ error: 'Invalid image URL.' });
         }
@@ -74,6 +84,5 @@ app.get('/api/image', async (req, res) => {
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+// Vercel doesn't need app.listen
+export default app;
