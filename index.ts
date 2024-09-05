@@ -69,16 +69,15 @@ app.get('/api/image', async (req, res) => {
         }
 
         const response = await axios.get(imageUrl, {
-            responseType: 'stream',
+            responseType: 'stream',  
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
             }
         });
 
-        // Had to set a proper Content-Type header based on the image...
         const contentType = response.headers['content-type'];
         if (!contentType || !contentType.startsWith('image/')) {
-            return res.status(400).json({ error: 'Invalid content type for image.' });
+            return res.status(400).json({ error: 'Invalid content type for an image.' });
         }
 
         res.setHeader('Content-Type', contentType);
@@ -88,6 +87,7 @@ app.get('/api/image', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch image.' });
     }
 });
+
 
 
 // Vercel doesn't need app.listen
