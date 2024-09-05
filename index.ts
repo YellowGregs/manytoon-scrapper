@@ -64,7 +64,6 @@ app.get('/api/image', async (req, res) => {
     }
 
     try {
-        // Better image URL validation
         if (!imageUrl.startsWith('https://manytoon.com/')) {
             return res.status(400).json({ error: 'Invalid image URL.' });
         }
@@ -76,13 +75,20 @@ app.get('/api/image', async (req, res) => {
             }
         });
 
-        res.setHeader('Content-Type', response.headers['content-type']);
+        // Had to set a proper Content-Type header based on the image...
+        const contentType = response.headers['content-type'];
+        if (!contentType || !contentType.startsWith('image/')) {
+            return res.status(400).json({ error: 'Invalid content type for image.' });
+        }
+
+        res.setHeader('Content-Type', contentType);
         response.data.pipe(res);
     } catch (error) {
         console.error(`Error fetching image: ${(error as Error).message}`);
         res.status(500).json({ error: 'Failed to fetch image.' });
     }
 });
+
 
 // Vercel doesn't need app.listen
 export default app;
