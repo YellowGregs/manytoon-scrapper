@@ -10,7 +10,7 @@
         "axios": "^0.21.4",
         "cheerio": "^1.0.0",
         "cors": "^2.8.5",
-        "express": "^4.19.2"
+        "express": "^4.21.0"
     },
     "keywords": [],
     "author": "",
