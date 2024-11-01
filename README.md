@@ -2,6 +2,10 @@
 
 A fun project for scraping manga images from Manytoon.
 
+## Bug Fixes
+
+- Fixed an issue where the `/api/image` endpoint returned an "Invalid image URL" error when processing certain image URLs. The error was due to incorrect validation of the image URL format, which has now been corrected to properly handle valid URLs from Manytoon.
+
 ## Endpoints
 
 ### `/api/images/:manhwaName/chapter-:chapterNumber`
@@ -44,4 +48,4 @@ http://localhost:3000/api/image?url=https://manytoon.com/wp-content/uploads/WP-m
 ```
 
 When you enter the URL, the image will be displayed directly.
-
+```
