@@ -58,7 +58,7 @@ app.get('/api/image', async (req, res) => {
     }
 
     try {
-        if (!imageUrl.startsWith('https://manytoon.com/')) {
+        if (!imageUrl.startsWith('https://manytoon.com/') && !imageUrl.startsWith('https://manytoon.org/')) {
             return res.status(400).json({ error: 'Invalid image URL.' });
         }
 
