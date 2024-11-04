@@ -82,4 +82,41 @@ app.get('/api/image', async (req, res) => {
     }
 });
 
+app.get('/api/:manhwaName/details', async (req, res) => {
+    const { manhwaName } = req.params;
+    const mangaUrl = `https://manytoon.org/comic/${manhwaName}/`;
+
+    try {
+        const { data } = await axios.get(mangaUrl, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
+            }
+        });
+
+        const $ = cheerio.load(data);
+
+        // Extracting details 
+        const title = $('.post-title h1').clone().children().remove().end().text().trim(); // :3
+        const rating = $('.box-rating-text .score').text().trim();
+        const ratingCount = $('#countrate').text().trim();
+        const genres = $('.genres-content a').map((_, el) => $(el).text().trim()).get();
+        const status = $('.post-status .summary-content').last().text().trim();
+        const releaseYear = $('.post-status .summary-content a[rel="tag"]').text().trim();
+        const imageUrl = $('.summary_image img').attr('src') || '';
+
+        res.json({
+            title,
+            rating,
+            ratingCount,
+            genres,
+            status,
+            releaseYear,
+            imageUrl
+        });
+    } catch (error) {
+        console.error(`Error scraping manga details: ${(error as Error).message}`);
+        res.status(500).json({ error: 'Failed to scrape manga details.' });
+    }
+});
+
 export default app;
