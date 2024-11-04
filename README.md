@@ -1,10 +1,10 @@
-# manytoon-scrapper
+# Manytoon-Scrapper
 
-A fun project for scraping manga images from Manytoon.
+A fun project for scraping manga images and details from Manytoon.
 
 ## Bug Fixes
 
-- Fixed an issue where the `/api/image` endpoint returned an "Invalid image URL" error when processing certain image URLs. The error was due to incorrect validation of the image URL format, which has now been corrected to properly handle valid URLs from Manytoon.
+- Fixed an issue where the `/api/image` endpoint returned an "Invalid image URL" error when processing certain image URLs. This was due to incorrect URL validation, which has now been corrected to properly handle valid URLs from Manytoon.
 
 ## Endpoints
 
@@ -48,4 +48,32 @@ http://localhost:3000/api/image?url=https://manytoon.com/wp-content/uploads/WP-m
 ```
 
 When you enter the URL, the image will be displayed directly.
+
+### `/api/:manhwaName/details`
+
+Fetches details about a specific manhwa, including title, rating, genre, release year, and status.
+
+**Example URL:**
+
 ```
+http://localhost:3000/api/secret-hot-spring-inn/details
+```
+
+**Response Example:**
+
+```json
+{
+  "title": "Secret Hot Spring Inn",
+  "rating": "5",
+  "ratingCount": "3",
+  "genres": [
+    "Drama",
+    "Manhwa",
+    "Romance"
+  ],
+  "status": "OnGoing",
+  "releaseYear": "2024",
+  "imageUrl": "https://manytoon.org/wp-content/uploads/2024/09/Secret-Hot-Spring-Inn-193x278-1.jpg"
+}
+```
+
