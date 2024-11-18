@@ -2,21 +2,33 @@ import express from 'express';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 
 app.use(cors());
 
+const limiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 60, // 60 requests per minute
+    message: 'Too many requests, please try again later.'
+});
+app.use(limiter);
+
+// (alphanumeric + hyphen allowed) 
+// i dont know what the fuck im doing i just wanna update this file ok
+const IDontKnowWhatImDoing = (name: string) => /^[a-zA-Z0-9-]+$/.test(name);
+
 app.get('/api/images/:manhwaName/chapter-:chapterNumber', async (req, res) => {
     const { manhwaName, chapterNumber } = req.params;
 
+    if (!manhwaName || !chapterNumber || !IDontKnowWhatImDoing(manhwaName) || isNaN(Number(chapterNumber))) {
+        return res.status(400).json({ error: 'Wrong manhwa name or chapter number.' });
+    }
+
+    const chapterUrl = `https://manytoon.com/comic/${manhwaName}/chapter-${chapterNumber}/`;
+
     try {
-        if (!manhwaName || !chapterNumber || isNaN(Number(chapterNumber))) {
-            return res.status(400).json({ error: 'Invalid manhwa name or chapter number.' });
-        }
-
-        const chapterUrl = `https://manytoon.com/comic/${manhwaName}/chapter-${chapterNumber}/`;
-
         const { data } = await axios.get(chapterUrl, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
@@ -66,7 +78,8 @@ app.get('/api/image', async (req, res) => {
             responseType: 'stream',
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
-            }
+            },
+            maxRedirects: 5
         });
 
         const contentType = response.headers['content-type'];
@@ -75,6 +88,7 @@ app.get('/api/image', async (req, res) => {
         }
 
         res.setHeader('Content-Type', contentType);
+        res.setHeader('X-Content-Type-Options', 'nosniff');
         response.data.pipe(res);
     } catch (error) {
         console.error(`Error fetching image: ${(error as Error).message}`);
