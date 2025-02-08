@@ -17,7 +17,6 @@ const limiter = rateLimit({
 app.use(limiter);
 
 const allowedImageDomains = ['manytoon.com', 'manytoon.org'];
-
 const isValidManhwaName = (name: string): boolean => /^[a-zA-Z0-9-]+$/.test(name);
 
 const axiosInstance = axios.create({
@@ -25,7 +24,7 @@ const axiosInstance = axios.create({
     'User-Agent':
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
   },
-  timeout: 15000,
+  timeout: 15000, // 15 seconds timeout for requests
   maxRedirects: 5,
 });
 
@@ -98,53 +97,24 @@ app.get('/api/:manhwaName/details', async (req: Request, res: Response) => {
   if (!manhwaName || !isValidManhwaName(manhwaName)) {
     return res.status(400).json({ error: 'Invalid manhwa name.' });
   }
+
   const mangaUrl = `https://manytoon.org/comic/${manhwaName}/`;
 
   try {
     const { data } = await axiosInstance.get(mangaUrl);
     const $ = cheerio.load(data);
 
-    const title = $('.post-title h1').text().trim();
-    const imageUrl = $('.summary_image img').attr('src') || '';
+    const title = $('.post-title h1').clone().children().remove().end().text().trim();
     const rating = $('.box-rating-text .score').text().trim();
     const ratingCount = $('#countrate').text().trim();
-    const genres = $('.genres-content a').map((_, el) => $(el).text().trim()).get();
-
-    const getDetailByHeading = (heading: string): string => {
-      let detail = '';
-      $('.post-content_item').each((_, el) => {
-        const headingText = $(el).find('.summary-heading h5').text().trim();
-        if (headingText.toLowerCase().includes(heading.toLowerCase())) {
-          detail = $(el).find('.summary-content').text().trim();
-          return false;
-        }
-      });
-      return detail;
-    };
-
-    const rank = getDetailByHeading('Rank');
-    const alternative = getDetailByHeading('Alternative');
-    const type = getDetailByHeading('Type');
-    const release = getDetailByHeading('Release');
-    const status = getDetailByHeading('Status');
-
-    const authors = $('.author-content a')
+    const genres = $('.genres-content a')
       .map((_, el) => $(el).text().trim())
       .get();
+    const status = $('.post-status .summary-content').last().text().trim();
+    const releaseYear = $('.post-status .summary-content a[rel="tag"]').text().trim();
+    const imageUrl = $('.summary_image img').attr('src') || '';
 
-    res.json({
-      title,
-      imageUrl,
-      rating,
-      ratingCount,
-      genres,
-      rank,
-      alternative,
-      authors,
-      type,
-      release,
-      status
-    });
+    res.json({ title, rating, ratingCount, genres, status, releaseYear, imageUrl });
   } catch (error) {
     console.error(`Error scraping manga details: ${(error as Error).message}`);
     res.status(500).json({ error: 'Failed to scrape manga details.' });
