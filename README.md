@@ -11,7 +11,7 @@ A fun project for scraping manga images and details from Manytoon.
 Fetches the **latest manhwa updates** from Manytoon with pagination.
 
 **Example URL:**
-[http://localhost:3000/api/latest?page=1](http://localhost:3000/api/latest?page=1)
+[http://localhost:3000/api/latest?page=3](http://localhost:3000/api/latest?page=3)
 
 
 **Response Example:**
