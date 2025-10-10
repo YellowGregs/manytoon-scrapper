@@ -6,6 +6,8 @@ A fun project for scraping manga images and details from Manytoon.
 
 ## 📂 Endpoints
 
+Url if you dont want to use your own vercel: https://manytoon-scrapper.vercel.app
+
 ### `/api/latest?page=<number>`
 
 Fetches the **latest manhwa updates** from Manytoon with pagination.
