@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors());
 
@@ -75,25 +76,26 @@ app.get('/api/latest', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'No comics found for this page.' });
     }
 
-    const next_link =
-      $('.nav-previous a').attr('href') ||
-      $('.pagination .next a').attr('href') ||
-      $('.wp-pagenavi a.next').attr('href') ||
-      $('.nav-links .next a').attr('href');
+const next_link =
+  $('.nav-previous a').attr('href') ||
+  $('.pagination .next a').attr('href') ||
+  $('.wp-pagenavi a.next').attr('href') ||
+  $('.nav-links .next a').attr('href');
 
-    const prev_link =
-      $('.nav-next a').attr('href') ||
-      $('.pagination .prev a').attr('href') ||
-      $('.wp-pagenavi a.previous').attr('href') ||
-      $('.nav-links .prev a').attr('href');
-    
-    const next_page = next_link
-      ? `${req.protocol}://${req.get('host')}/api/latest?page=${Number(page) + 1}`
-      : null;
+const prev_link =
+  $('.nav-next a').attr('href') ||
+  $('.pagination .prev a').attr('href') ||
+  $('.wp-pagenavi a.previous').attr('href') ||
+  $('.nav-links .prev a').attr('href');
 
-    const prev_page = prev_link
-      ? `${req.protocol}://${req.get('host')}/api/latest?page=${Number(page) - 1}`
-      : null;
+const next_page = next_link
+  ? `${req.protocol}://${req.get('host')}/api/latest?page=${Number(page) + 1}`
+  : null;
+
+const prev_page = prev_link
+  ? `${req.protocol}://${req.get('host')}/api/latest?page=${Number(page) - 1}`
+  : null;
+
 
     res.json({
       page,
@@ -199,5 +201,6 @@ app.get('/api/details', async (req: Request, res: Response) => {
 });
 
 export default app;
+
 
 
