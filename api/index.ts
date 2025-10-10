@@ -75,8 +75,18 @@ app.get('/api/latest', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'No comics found for this page.' });
     }
 
-    const next_page_exists = !!$('.pagination .next').length;
-    const prev_page_exists = !!$('.pagination .prev').length;
+    const next_page_exists =
+      $('.pagination .next').length > 0 ||
+      $('.nav-previous a').length > 0 ||
+      $('.wp-pagenavi a.next').length > 0 ||
+      $('.nav-links .next').length > 0;
+
+    const prev_page_exists =
+      $('.pagination .prev').length > 0 ||
+      $('.nav-next a').length > 0 ||
+      $('.wp-pagenavi a.previous').length > 0 ||
+      $('.nav-links .prev').length > 0;
+
 
     res.json({
       page,
@@ -182,3 +192,4 @@ app.get('/api/details', async (req: Request, res: Response) => {
 });
 
 export default app;
+
