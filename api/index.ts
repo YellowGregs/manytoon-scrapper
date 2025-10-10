@@ -75,18 +75,25 @@ app.get('/api/latest', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'No comics found for this page.' });
     }
 
-    const next_page_exists =
-      $('.pagination .next').length > 0 ||
-      $('.nav-previous a').length > 0 ||
-      $('.wp-pagenavi a.next').length > 0 ||
-      $('.nav-links .next').length > 0;
+    const next_link =
+      $('.nav-previous a').attr('href') ||
+      $('.pagination .next a').attr('href') ||
+      $('.wp-pagenavi a.next').attr('href') ||
+      $('.nav-links .next a').attr('href');
 
-    const prev_page_exists =
-      $('.pagination .prev').length > 0 ||
-      $('.nav-next a').length > 0 ||
-      $('.wp-pagenavi a.previous').length > 0 ||
-      $('.nav-links .prev').length > 0;
+    const prev_link =
+      $('.nav-next a').attr('href') ||
+      $('.pagination .prev a').attr('href') ||
+      $('.wp-pagenavi a.previous').attr('href') ||
+      $('.nav-links .prev a').attr('href');
+    
+    const next_page = next_link
+      ? `${req.protocol}://${req.get('host')}/api/latest?page=${Number(page) + 1}`
+      : null;
 
+    const prev_page = prev_link
+      ? `${req.protocol}://${req.get('host')}/api/latest?page=${Number(page) - 1}`
+      : null;
 
     res.json({
       page,
@@ -192,4 +199,5 @@ app.get('/api/details', async (req: Request, res: Response) => {
 });
 
 export default app;
+
 
